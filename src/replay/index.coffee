@@ -18,7 +18,7 @@ HTTP.request = (options, callback)->
   if options && options.headers && options.headers["Upgrade"] == "websocket"
     return httpRequest(options, callback)
   hostname = options.hostname || (options.host && options.host.split(":")[0]) || "localhost"
-  if Replay.isLocalhost(hostname)
+  if Replay.isLocalhost({hostname: hostname, host: options.host})
     return httpRequest(options, callback)
   # Proxy request
   request = new ProxyRequest(options, Replay, Replay.chain.start)

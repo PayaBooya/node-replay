@@ -67,6 +67,7 @@ class Replay extends EventEmitter
         if @debug || !@silent
           console.error message
     @mode = mode
+    @recordLocalhost = false
     # localhost servers. pass requests directly to host, and route to 127.0.0.1.
     @_localhosts = { localhost: true, '127.0.0.1': true }
     # allowed servers. allow network access to any servers listed here.
@@ -124,9 +125,22 @@ class Replay extends EventEmitter
       delete @_ignored[host]
 
   # True if this host should be treated as localhost.
-  isLocalhost: (host)->
-    domain = host.replace(/^[^.]+/, '*')
-    return !!(@_localhosts[host] || @_localhosts[domain] || @_localhosts["*.#{host}"])
+  isLocalhost: (hostName)->
+    hostname = null
+    host = null
+    if hostName.hostname?
+      hostname = hostName.hostname
+      host = hostName.host
+    else
+      hostname = hostName
+      host = hostName
+
+    domain = hostname.replace(/^[^.]+/, '*')
+
+    if @recordLocalhost and hostname? is 'localhost'
+      return !!(@_localhosts[host] || @_localhosts[domain] || @_localhosts["*.#{host}"])
+
+    return !!(@_localhosts[hostname] || @_localhosts[domain] || @_localhosts["*.#{hostname}"])
 
   @prototype.__defineGetter__ "fixtures", ->
     @catalog.getFixturesDir()
@@ -148,7 +162,7 @@ passWhenBloodyOrCheat = (request)->
   return replay.isAllowed(request.url.hostname) ||
          (replay.mode == "cheat" && !replay.isIgnored(request.url.hostname))
 passToLocalhost = (request)->
-  return replay.isLocalhost(request.url.hostname) ||
+  return replay.isLocalhost({hostname: request.url.hostname, host: request.url.host}) ||
          replay.mode == "bloody"
 
 replay.use passThrough(passWhenBloodyOrCheat)
