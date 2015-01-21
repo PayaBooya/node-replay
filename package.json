@@ -21,7 +21,7 @@
   "scripts": {
     "build":        "coffee --bare --compile --output lib/replay src/replay/*.coffee",
     "prepublish":   "coffee --bare --compile --output lib/replay src/replay/*.coffee",
-    "postpublish":  "rm -rf lib",
+    "postpublish":  "echo \"Installation of node-replay is finished.\"",
     "test":         "./node_modules/.bin/mocha"
   },
   "dependencies": {
