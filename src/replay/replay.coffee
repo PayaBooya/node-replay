@@ -137,7 +137,7 @@ class Replay extends EventEmitter
 
     domain = hostname.replace(/^[^.]+/, '*')
 
-    if @recordLocalhost and hostname? is 'localhost'
+    if @recordLocalhost and hostname is 'localhost'
       return !!(@_localhosts[host] || @_localhosts[domain] || @_localhosts["*.#{host}"])
 
     return !!(@_localhosts[hostname] || @_localhosts[domain] || @_localhosts["*.#{hostname}"])
